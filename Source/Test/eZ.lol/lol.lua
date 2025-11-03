@@ -918,6 +918,59 @@ function OrionLib:MakeWindow(WindowConfig)
 		fadeInTween:Play()
 	end
 
+	function OrionLib.AnimateTitlePartial(newTitle, oldTitle, delayPerChar)
+		delayPerChar = delayPerChar or 0.05
+		oldTitle = oldTitle or WindowName.Text
+
+		local maxLen = math.max(#oldTitle, #newTitle)
+		local minLen = math.min(#oldTitle, #newTitle)
+
+		local diffStart = 1
+		while diffStart <= minLen and string.sub(oldTitle, diffStart, diffStart) == string.sub(newTitle, diffStart, diffStart) do
+			diffStart = diffStart + 1
+		end
+
+		if #oldTitle > #newTitle then
+			for i = #oldTitle, #newTitle + 1, -1 do
+				local current = string.sub(oldTitle, 1, i - 1)
+				WindowName.Text = current
+				WindowName.TextTransparency = 0
+				local tween = TweenService:Create(WindowName, TweenInfo.new(delayPerChar, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {TextTransparency = 1})
+				tween:Play()
+				tween.Completed:Wait()
+				WindowName.TextTransparency = 0
+				task.wait(delayPerChar)
+			end
+		end
+
+		if #newTitle > #oldTitle then
+			for i = #oldTitle + 1, #newTitle do
+				local current = string.sub(newTitle, 1, i)
+				WindowName.Text = current
+				WindowName.TextTransparency = 1
+				local tween = TweenService:Create(WindowName, TweenInfo.new(delayPerChar, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {TextTransparency = 0})
+				tween:Play()
+				tween.Completed:Wait()
+				task.wait(delayPerChar)
+			end
+		end
+
+		if diffStart <= minLen then
+			for i = diffStart, minLen do
+				local current = string.sub(newTitle, 1, i)
+				WindowName.Text = current
+				WindowName.TextTransparency = 1
+				local tween = TweenService:Create(WindowName, TweenInfo.new(delayPerChar, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {TextTransparency = 0})
+				tween:Play()
+				tween.Completed:Wait()
+				task.wait(delayPerChar)
+			end
+		end
+
+		WindowName.Text = newTitle
+		WindowName.TextTransparency = 0
+	end
+
 	local TabFunction = {}
 	function TabFunction:MakeTab(TabConfig)
 		TabConfig = TabConfig or {}
